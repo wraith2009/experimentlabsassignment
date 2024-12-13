@@ -2,6 +2,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import SignInPageComponent from "./components/(auth)/signin";
 import SignUpPageComponent from "./components/(auth)/signup";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import EventManagementCalendar from "./components/dashboard/calander";
 
 const appRouting = createBrowserRouter([
   {
@@ -11,6 +12,15 @@ const appRouting = createBrowserRouter([
   {
     path: "Sign-up",
     element: <SignUpPageComponent />,
+  },
+  {
+    path: "/Home",
+    children: [
+      {
+        index: true,
+        element: <EventManagementCalendar />,
+      },
+    ],
   },
 ]);
 const App = () => {

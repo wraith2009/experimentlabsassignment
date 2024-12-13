@@ -1,3 +1,4 @@
+import { jwtAuth } from "./../middleware/auth.middleware";
 import { Router } from "express";
 import {
   CreateEvent,
@@ -8,9 +9,9 @@ import {
 
 const EventRouter = Router();
 
-EventRouter.route("/create-event").post(CreateEvent);
+EventRouter.route("/create-event").post(jwtAuth, CreateEvent);
 EventRouter.route("/get-event").post(GetEvents);
-EventRouter.route("/update-event").post(UpdateEvent);
-EventRouter.route("/delete-event").post(DeleteEvents);
+EventRouter.route("/update-event").post(jwtAuth, UpdateEvent);
+EventRouter.route("/delete-event").post(jwtAuth, DeleteEvents);
 
 export default EventRouter;
