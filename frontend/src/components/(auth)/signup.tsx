@@ -38,7 +38,7 @@ const SignUpPageComponent = () => {
       const response = await apiCall("/sign-up", formData);
 
       if (response) {
-        navigate("/Sign-in");
+        navigate("/sign-in");
       }
     } catch (err: any) {
       setError(err.message || "Failed to register. Please try again.");

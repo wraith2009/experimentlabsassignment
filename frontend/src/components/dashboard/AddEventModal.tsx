@@ -1,25 +1,14 @@
 import React, { useState, useEffect } from "react";
-import apiCall from "../../api/api";
+
 import { UserIdState } from "../../recoil/atom/auth.atoms";
 import { useRecoilValue } from "recoil";
+import { CalendarEvent } from "../../recoil/atom/event.atoms";
 
 interface EventModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (event: {
-    id: string;
-    title: string;
-    startDate: Date;
-    endDate: Date;
-    desc?: string;
-  }) => void;
-  existingEvent?: {
-    id: string;
-    title: string;
-    startDate: Date;
-    endDate: Date;
-    desc?: string;
-  } | null;
+  onSave: (event: CalendarEvent) => void;
+  existingEvent?: CalendarEvent | null;
 }
 
 const EventModal: React.FC<EventModalProps> = ({
@@ -39,7 +28,7 @@ const EventModal: React.FC<EventModalProps> = ({
       setTitle(existingEvent.title);
       setStartDate(existingEvent.startDate);
       setEndDate(existingEvent.endDate);
-      setDesc(existingEvent.desc || "");
+      setDesc(existingEvent.description || "");
     } else {
       resetForm();
     }
@@ -71,24 +60,17 @@ const EventModal: React.FC<EventModalProps> = ({
       return;
     }
 
-    const eventData = {
+    const eventData: CalendarEvent = {
       id: existingEvent?.id || "",
       title,
       startDate,
       endDate,
-      description: desc || undefined,
-      userId: userId,
+      description: desc || "",
+      userId: userId || "",
     };
 
-    const url = existingEvent ? "/update-event" : "/create-event";
-
-    try {
-      await apiCall(url, eventData);
+    if (eventData) {
       onSave(eventData);
-      onClose();
-    } catch (error) {
-      console.error("Error saving event:", error);
-      alert("Failed to save event. Please try again.");
     }
   };
 

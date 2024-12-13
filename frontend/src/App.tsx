@@ -6,15 +6,19 @@ import EventManagementCalendar from "./components/dashboard/calander";
 
 const appRouting = createBrowserRouter([
   {
-    path: "Sign-in",
+    path: "/",
     element: <SignInPageComponent />,
   },
   {
-    path: "Sign-up",
+    path: "sign-in",
+    element: <SignInPageComponent />,
+  },
+  {
+    path: "sign-up",
     element: <SignUpPageComponent />,
   },
   {
-    path: "/Home",
+    path: "/home",
     children: [
       {
         index: true,

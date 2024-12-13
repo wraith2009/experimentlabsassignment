@@ -6,22 +6,24 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 import apiCall from "../../api/api";
 import EventModal from "./AddEventModal";
 import { UserIdState } from "../../recoil/atom/auth.atoms";
-import { useRecoilValue } from "recoil";
+import { useRecoilValue, useRecoilState } from "recoil";
 import { Container } from "./container";
 import { Header } from "./header";
+import { eventState } from "../../recoil/atom/event.atoms";
 
-// Calendar Event Interface
 interface CalendarEvent extends Event {
   id: string;
   title: string;
-  start: Date;
-  end: Date;
-  desc?: string;
+  startDate: Date;
+  endDate: Date;
+  description: string;
+  userId?: string;
 }
 
 const EventManagementCalendar: React.FC = () => {
   const localizer = momentLocalizer(moment);
-  const [events, setEvents] = useState<CalendarEvent[]>([]);
+  const [globalEvents, setGlobalEvents] = useRecoilState(eventState);
+  const [global, setGlobal] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [eventToEdit, setEventToEdit] = useState<CalendarEvent | null>(null);
   const [selectedDateEvents, setSelectedDateEvents] = useState<CalendarEvent[]>(
@@ -29,7 +31,6 @@ const EventManagementCalendar: React.FC = () => {
   );
   const userId = useRecoilValue(UserIdState);
 
-  // Fetch events from the backend
   useEffect(() => {
     const fetchEvents = async () => {
       try {
@@ -37,46 +38,49 @@ const EventManagementCalendar: React.FC = () => {
         const fetchedEvents = response.data.map((event: any) => ({
           id: event.id,
           title: event.title,
-          start: new Date(event.startDate),
-          end: new Date(event.endDate),
-          desc: event.description || "",
+          startDate: new Date(event.startDate),
+          endDate: new Date(event.endDate),
+          description: event.description || "",
         }));
-        setEvents(fetchedEvents);
-        handleDateSelect(new Date()); // Show today's events by default
+        setGlobalEvents(fetchedEvents);
+        handleDateSelect(new Date());
       } catch (error) {
         console.error("Error fetching events:", error);
         alert("Failed to fetch events. Please try again.");
       }
     };
     fetchEvents();
-  }, [userId]);
+  }, [userId, setGlobalEvents]);
 
+  useEffect(() => {
+    setSelectedDateEvents(globalEvents);
+  }, [globalEvents, setGlobal]);
+
+  console.log("global", global);
+  console.log("events", globalEvents);
   const toggleModal = () => setIsModalOpen(!isModalOpen);
 
-  const addEvent = async (newEvent: CalendarEvent) => {
-    setEvents((prevEvents) => [...prevEvents, newEvent]);
-    setIsModalOpen(false);
-  };
-
-  const updateEvent = async (updatedEvent: CalendarEvent) => {
-    setEvents((prevEvents) =>
-      prevEvents.map((event) =>
-        event.id === updatedEvent.id ? updatedEvent : event
-      )
-    );
-    setIsModalOpen(false);
-    setEventToEdit(null);
-    handleDateSelect(updatedEvent.start);
-  };
+  const handleDateSelect = useCallback(
+    (date: Date) => {
+      const selectedDate = moment(date).startOf("day");
+      const filteredEvents = globalEvents.filter((event) =>
+        moment(event.startDate).isSame(selectedDate, "day")
+      );
+      setSelectedDateEvents(filteredEvents);
+    },
+    [globalEvents]
+  );
 
   const deleteEvent = async (eventId: string) => {
     if (window.confirm("Are you sure you want to delete this event?")) {
       try {
         await apiCall("/delete-event", { eventId });
-        setEvents((prevEvents) =>
+        setGlobalEvents((prevEvents) =>
           prevEvents.filter((event) => event.id !== eventId)
         );
-        setSelectedDateEvents([]);
+        setSelectedDateEvents((prevEvents) =>
+          prevEvents.filter((event) => event.id !== eventId)
+        );
       } catch (error) {
         console.error("Error deleting event:", error);
         alert("Failed to delete event. Please try again.");
@@ -84,37 +88,71 @@ const EventManagementCalendar: React.FC = () => {
     }
   };
 
-  const handleDateSelect = useCallback(
-    (date: Date) => {
-      const selectedDate = moment(date).startOf("day");
-      const filteredEvents = events.filter((event) =>
-        moment(event.start).isSame(selectedDate, "day")
+  const updateEvent = async (updatedEvent: CalendarEvent) => {
+    try {
+      const response = await apiCall("/update-event", updatedEvent);
+      console.log(response);
+      setGlobalEvents((prevEvents) =>
+        prevEvents.map((event) =>
+          event.id === updatedEvent.id ? updatedEvent : event
+        )
       );
-      setSelectedDateEvents(filteredEvents);
-    },
-    [events]
-  );
+      setSelectedDateEvents((prevEvents) =>
+        prevEvents.map((event) =>
+          event.id === updatedEvent.id ? updatedEvent : event
+        )
+      );
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error("Error updating event:", error);
+      alert("Failed to update event. Please try again.");
+    }
+  };
+
+  const addEvent = async (newEvent: CalendarEvent) => {
+    try {
+      const response = await apiCall("/create-event", newEvent);
+      console.log(response);
+      const addedEvent = {
+        ...newEvent,
+        id: response.event.id,
+      };
+      setGlobalEvents((prevEvents) => [...prevEvents, addedEvent]);
+      setSelectedDateEvents((prevEvents) => [...prevEvents, addedEvent]);
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error("Error adding event:", error);
+      alert("Failed to add event. Please try again.");
+    }
+  };
+
+  console.log("selectedDateEvents", selectedDateEvents);
 
   return (
     <>
       <Header />
+
       <Container>
         <>
           <div className="flex flex-col lg:flex-row mx-auto h-[calc(100dvh_-_80.8px)] p-4 md:p-8">
             <div className="w-full lg:w-9/12 lg:pr-4 mb-4 lg:mb-0">
               <div className="bg-white h-[400px] md:h-[600px] lg:h-[600px]">
-                <Calendar
-                  localizer={localizer}
-                  events={events}
-                  startAccessor="start"
-                  endAccessor="end"
-                  onSelectEvent={(event) => handleDateSelect(event.start)}
-                  selectable
-                  className="h-full custom-calendar"
-                  views={["month", "week", "day"]}
-                  defaultView="month"
-                  style={{ height: "500" }}
-                />
+                {globalEvents.length > 0 && (
+                  <Calendar
+                    localizer={localizer}
+                    events={globalEvents}
+                    startAccessor="startDate"
+                    endAccessor="endDate"
+                    onSelectEvent={(event: CalendarEvent) =>
+                      handleDateSelect(event.startDate)
+                    }
+                    selectable
+                    className="h-full custom-calendar"
+                    views={["month", "week", "day"]}
+                    defaultView="month"
+                    style={{ height: "500" }}
+                  />
+                )}
               </div>
             </div>
 
@@ -154,9 +192,9 @@ const EventManagementCalendar: React.FC = () => {
                           {moment(event.start).format("h:mm A")} -{" "}
                           {moment(event.end).format("h:mm A")}
                         </p>
-                        {event.desc && (
+                        {event.description && (
                           <p className="text-sm text-gray-500 mt-2">
-                            {event.desc}
+                            {event.description}
                           </p>
                         )}
                         <div className="mt-4 flex space-x-2">
@@ -196,8 +234,9 @@ const EventManagementCalendar: React.FC = () => {
               eventToEdit
                 ? {
                     ...eventToEdit,
-                    startDate: eventToEdit.start,
-                    endDate: eventToEdit.end,
+                    startDate: eventToEdit.startDate,
+                    endDate: eventToEdit.endDate,
+                    description: eventToEdit.description || "",
                   }
                 : null
             }

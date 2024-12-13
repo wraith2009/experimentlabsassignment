@@ -41,7 +41,7 @@ const SignInPageComponent = () => {
       if (response) {
         localStorage.setItem("token", response.data.token);
         setUserId(response.data.user.id);
-        navigate("/Home");
+        navigate("/home");
       } else {
         setError("Failed to sign in. Please try again.");
       }
@@ -108,17 +108,6 @@ const SignInPageComponent = () => {
             </div>
           </div>
 
-          <div className="flex items-center justify-between">
-            <div className="text-sm">
-              <Link
-                to="#"
-                className="font-medium text-indigo-600 hover:text-indigo-500"
-              >
-                Forgot password?
-              </Link>
-            </div>
-          </div>
-
           <div>
             <button
               type="submit"
@@ -142,7 +131,7 @@ const SignInPageComponent = () => {
           <p className="text-sm text-gray-600">
             Don't have an account?{" "}
             <Link
-              to="/Sign-up"
+              to="/sign-up"
               className="font-medium text-indigo-600 hover:text-indigo-500"
             >
               Sign up
