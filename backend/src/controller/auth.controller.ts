@@ -74,6 +74,7 @@ export const googleLogin = async (
     if (!JWT_PASSWORD) {
       throw new Error("JWT_PASSWORD is not defined");
     }
+    console.log("in authcontro", JWT_PASSWORD);
     const token = jwt.sign({ id }, JWT_PASSWORD);
 
     res.status(200).json({
@@ -162,10 +163,11 @@ export const LoginUser = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    if (!JWT_SECRET) {
+    if (!JWT_PASSWORD) {
       throw new Error("JWT_SECRET is not defined");
     }
-    const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET);
+    console.log("in authcontro", JWT_PASSWORD);
+    const token = jwt.sign({ id: user.id, email: user.email }, JWT_PASSWORD);
 
     const { password: _, ...userData } = user;
     res.status(200).json({

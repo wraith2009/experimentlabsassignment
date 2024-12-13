@@ -35,7 +35,7 @@ const SignUpPageComponent = () => {
     }
 
     try {
-      const response = await apiCall("/Signup", formData);
+      const response = await apiCall("/sign-up", formData);
 
       if (response) {
         navigate("/Sign-in");

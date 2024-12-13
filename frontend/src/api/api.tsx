@@ -8,6 +8,8 @@ const apiCall = async (
 ) => {
   try {
     const token = localStorage.getItem("token");
+    console.log(`token: ${token}`);
+    console.log(data);
     const response = await axios({
       method,
       url: `${API_URL}${url}`,

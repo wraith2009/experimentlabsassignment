@@ -5,10 +5,10 @@ export const CreateEvent = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const { userId, title, description, date } = req.body;
+  const { userId, title, description, startDate, endDate } = req.body;
   console.log(req.body);
   try {
-    if (!userId || !title || !description || !date) {
+    if (!userId || !title || !startDate || !endDate) {
       res.status(400).json({
         message: "Please provide all the details",
       });
@@ -16,8 +16,16 @@ export const CreateEvent = async (
     }
 
     console.log(title);
-    const parsedDate = new Date(date);
-    if (isNaN(parsedDate.getTime())) {
+    const parsedstartDate = new Date(startDate);
+    const parsedendDate = new Date(endDate);
+
+    if (isNaN(parsedstartDate.getTime())) {
+      res.status(400).json({
+        message: "Invalid date format",
+      });
+      return;
+    }
+    if (isNaN(parsedendDate.getTime())) {
       res.status(400).json({
         message: "Invalid date format",
       });
@@ -28,7 +36,8 @@ export const CreateEvent = async (
       data: {
         title,
         description,
-        date: parsedDate,
+        startDate: parsedstartDate,
+        endDate: parsedendDate,
         user: {
           connect: {
             id: userId,
@@ -53,21 +62,25 @@ export const UpdateEvent = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const { eventId, title, description } = req.body;
+  const { id, title, description, startDate, endDate } = req.body;
+
   try {
-    if (!eventId) {
+    if (!id) {
       res.status(404).json({
         message: "Invalid event",
       });
+      return;
     }
 
     const updatedEvent = await prisma.events.update({
       where: {
-        id: eventId,
+        id: id,
       },
       data: {
         title,
         description,
+        startDate: new Date(startDate),
+        endDate: new Date(endDate),
       },
     });
 
@@ -75,6 +88,7 @@ export const UpdateEvent = async (
       res.status(404).json({
         message: "Unable to update event",
       });
+      return;
     }
 
     res.status(200).json({
@@ -82,10 +96,13 @@ export const UpdateEvent = async (
       data: updatedEvent,
     });
   } catch (error) {
-    res.status(500).json({
-      error: error,
-      message: "Internal Server Error",
-    });
+    if (!res.headersSent) {
+      res.status(500).json({
+        error: error,
+        message: "Internal Server Error",
+      });
+    }
+    console.error("Unhandled error:", error);
   }
 };
 
@@ -96,14 +113,12 @@ export const GetEvents = async (req: Request, res: Response): Promise<void> => {
       res.status(404).json({
         message: "User not found",
       });
+      return;
     }
 
-    const events = await prisma.user.findFirst({
+    const events = await prisma.events.findMany({
       where: {
-        id: userId,
-      },
-      include: {
-        events: true,
+        userId: userId,
       },
     });
 
@@ -111,6 +126,7 @@ export const GetEvents = async (req: Request, res: Response): Promise<void> => {
       res.status(404).json({
         message: "User not found",
       });
+      return;
     }
 
     res.status(200).json({
@@ -135,6 +151,7 @@ export const DeleteEvents = async (
       res.status(404).json({
         messgae: "event not found",
       });
+      return;
     }
 
     await prisma.events.delete({

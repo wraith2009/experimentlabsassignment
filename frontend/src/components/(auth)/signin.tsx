@@ -29,7 +29,7 @@ const SignInPageComponent = () => {
     setError("");
     setLoading(true);
 
-    const url = "/Signin";
+    const url = "/login";
     const data = {
       email: formData.email,
       password: formData.password,
@@ -38,14 +38,15 @@ const SignInPageComponent = () => {
     try {
       const response = await apiCall(url, data);
 
-      if (response.token) {
-        localStorage.setItem("token", response.token);
-        setUserId(response.user._id);
+      if (response) {
+        localStorage.setItem("token", response.data.token);
+        setUserId(response.data.user.id);
         navigate("/Home");
       } else {
         setError("Failed to sign in. Please try again.");
       }
     } catch (err: any) {
+      console.log(err);
       setError(err.message || "Failed to sign in. Please try again.");
     } finally {
       setLoading(false);

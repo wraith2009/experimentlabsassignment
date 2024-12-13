@@ -25,7 +25,8 @@ model Events {
   id                String   @id @default(cuid())
   title             String
   description       String
-  date              DateTime
+  startDate         DateTime
+  endDate           DateTime
   userId            String
   user              User     @relation(fields: [userId], references: [id])
 }
