@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import AuthRouter from "./routes/auth.route";
-
+import EventRouter from "./routes/event.route";
 const app = express();
 
 app.use(express.json());
@@ -11,7 +11,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/v1", AuthRouter);
-
+app.use("/api/v1", EventRouter);
 app.use((req, res, next) => {
   const error: any = new Error("Not found");
   error.status = 404;
