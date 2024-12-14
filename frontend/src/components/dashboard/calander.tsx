@@ -165,13 +165,13 @@ const EventManagementCalendar: React.FC = () => {
 
               {selectedDateEvents.length > 0 ? (
                 <>
-                  <h2 className="text-xl font-bold mb-4 text-gray-800">
+                  <h2 className="text-xl font-bold mb-4 text-gray-800 ">
                     Events for{" "}
                     {moment(selectedDateEvents[0].start).format(
                       "MMMM Do, YYYY"
                     )}
                   </h2>
-                  <div className="space-y-4">
+                  <div className="space-y-4 overflow-y-scroll scrollbar-hide">
                     {selectedDateEvents.map((event) => (
                       <div
                         key={event.id}
