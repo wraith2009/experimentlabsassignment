@@ -92,6 +92,11 @@ A simple calendar application that allows users to create, view, edit, and delet
 
 ## Screenshots
 
+-home page
+![Alt Text](frontend/src/assets/eventcalander.jpg)
+-add event
+![Alt Text](frontend/src/assets/eventCalendar2.jpg)
+
 1. **Calendar View**
 
    - Displays a monthly or weekly view of events.
