@@ -139,7 +139,7 @@ const EventModal: React.FC<EventModalProps> = ({
 
           <div>
             <label className="block text-gray-700 font-medium mb-2">
-              Description (Optional)
+              Description
             </label>
             <textarea
               placeholder="Enter event description"
