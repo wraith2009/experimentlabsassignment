@@ -46,7 +46,6 @@ const SignInPageComponent = () => {
         setError("Failed to sign in. Please try again.");
       }
     } catch (err: any) {
-      console.log(err);
       setError(err.message || "Failed to sign in. Please try again.");
     } finally {
       setLoading(false);

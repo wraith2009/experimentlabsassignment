@@ -9,9 +9,41 @@ const auth_route_1 = __importDefault(require("./routes/auth.route"));
 const event_route_1 = __importDefault(require("./routes/event.route"));
 const google_route_1 = __importDefault(require("./routes/google.route"));
 const app = (0, express_1.default)();
+const allowedOrigins = [
+    "https://experimentlabsassignment-tak1.vercel.app",
+    "http://localhost:5173",
+];
+const corsOptions = {
+    origin: function (origin, callback) {
+        if (!origin) {
+            callback(null, true);
+            return;
+        }
+        const isAllowed = allowedOrigins.some((allowedOrigin) => allowedOrigin === origin);
+        if (isAllowed) {
+            callback(null, true);
+        }
+        else {
+            console.error(`CORS Error: Origin ${origin} not allowed.`);
+            callback(new Error("Not allowed by CORS"));
+        }
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allowedHeaders: [
+        "Content-Type",
+        "Authorization",
+        "X-Requested-With",
+        "Accept",
+        "Origin",
+    ],
+    exposedHeaders: ["Set-Cookie"],
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
+};
+app.use((0, cors_1.default)(corsOptions));
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: false }));
-app.use((0, cors_1.default)());
 app.get("/", (req, res) => {
     res.send("API is running");
 });

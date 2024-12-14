@@ -21,6 +21,8 @@ const EventModal: React.FC<EventModalProps> = ({
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
   const [desc, setDesc] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
   const userId = useRecoilValue(UserIdState);
 
   useEffect(() => {
@@ -32,6 +34,7 @@ const EventModal: React.FC<EventModalProps> = ({
     } else {
       resetForm();
     }
+    setIsLoading(false);
   }, [existingEvent, isOpen]);
 
   const resetForm = () => {
@@ -70,7 +73,12 @@ const EventModal: React.FC<EventModalProps> = ({
     };
 
     if (eventData) {
-      onSave(eventData);
+      setIsLoading(true);
+      try {
+        await onSave(eventData);
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -95,6 +103,7 @@ const EventModal: React.FC<EventModalProps> = ({
               onChange={(e) => setTitle(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
+              disabled={isLoading}
             />
           </div>
 
@@ -109,6 +118,7 @@ const EventModal: React.FC<EventModalProps> = ({
                 onChange={(e) => setStartDate(new Date(e.target.value))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
+                disabled={isLoading}
               />
             </div>
 
@@ -122,6 +132,7 @@ const EventModal: React.FC<EventModalProps> = ({
                 onChange={(e) => setEndDate(new Date(e.target.value))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
+                disabled={isLoading}
               />
             </div>
           </div>
@@ -136,6 +147,7 @@ const EventModal: React.FC<EventModalProps> = ({
               onChange={(e) => setDesc(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               rows={3}
+              disabled={isLoading}
             ></textarea>
           </div>
         </div>
@@ -144,14 +156,26 @@ const EventModal: React.FC<EventModalProps> = ({
           <button
             onClick={onClose}
             className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+            disabled={isLoading}
           >
             Cancel
           </button>
           <button
             onClick={handleSave}
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+            className={`px-4 py-2 rounded-lg transition-colors ${
+              isLoading
+                ? "bg-blue-300 text-white cursor-not-allowed"
+                : "bg-blue-500 text-white hover:bg-blue-600"
+            }`}
+            disabled={isLoading}
           >
-            {existingEvent ? "Update Event" : "Add Event"}
+            {isLoading
+              ? existingEvent
+                ? "Updating..."
+                : "Adding..."
+              : existingEvent
+              ? "Update Event"
+              : "Add Event"}
           </button>
         </div>
       </div>

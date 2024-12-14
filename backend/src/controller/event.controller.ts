@@ -6,7 +6,7 @@ export const CreateEvent = async (
   res: Response
 ): Promise<void> => {
   const { userId, title, description, startDate, endDate } = req.body;
-  console.log(req.body);
+
   try {
     if (!userId || !title || !startDate || !endDate) {
       res.status(400).json({
@@ -15,7 +15,6 @@ export const CreateEvent = async (
       return;
     }
 
-    console.log(title);
     const parsedstartDate = new Date(startDate);
     const parsedendDate = new Date(endDate);
 
@@ -51,7 +50,6 @@ export const CreateEvent = async (
       event,
     });
   } catch (error) {
-    console.log(error);
     res.status(500).json({
       message: "Failed to create event",
     });

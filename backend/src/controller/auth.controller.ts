@@ -23,7 +23,6 @@ export const googleLogin = async (
 ): Promise<void> => {
   const code = req.query.code as string | undefined;
 
-  console.log("code", code);
   if (!code) {
     res.status(400).json({
       message: "Authorization code is required",
@@ -74,7 +73,6 @@ export const googleLogin = async (
     if (!JWT_PASSWORD) {
       throw new Error("JWT_PASSWORD is not defined");
     }
-    console.log("in authcontro", JWT_PASSWORD);
     const token = jwt.sign({ id }, JWT_PASSWORD);
 
     res.status(200).json({
@@ -120,7 +118,6 @@ export const RegisterUser = async (
       data: user,
     });
   } catch (error) {
-    console.log(error);
     res.status(500).json({
       message: "Internal Server Error",
     });
@@ -166,7 +163,6 @@ export const LoginUser = async (req: Request, res: Response): Promise<void> => {
     if (!JWT_PASSWORD) {
       throw new Error("JWT_SECRET is not defined");
     }
-    console.log("in authcontro", JWT_PASSWORD);
     const token = jwt.sign({ id: user.id, email: user.email }, JWT_PASSWORD);
 
     const { password: _, ...userData } = user;

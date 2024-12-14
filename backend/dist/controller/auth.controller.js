@@ -36,7 +36,6 @@ const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 const oauth2Client = new googleapis_1.google.auth.OAuth2(GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, "postmessage");
 const googleLogin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const code = req.query.code;
-    console.log("code", code);
     if (!code) {
         res.status(400).json({
             message: "Authorization code is required",
@@ -78,7 +77,6 @@ const googleLogin = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         if (!config_2.JWT_PASSWORD) {
             throw new Error("JWT_PASSWORD is not defined");
         }
-        console.log("in authcontro", config_2.JWT_PASSWORD);
         const token = jsonwebtoken_1.default.sign({ id }, config_2.JWT_PASSWORD);
         res.status(200).json({
             token,
@@ -119,7 +117,6 @@ const RegisterUser = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         });
     }
     catch (error) {
-        console.log(error);
         res.status(500).json({
             message: "Internal Server Error",
         });
@@ -160,7 +157,6 @@ const LoginUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         if (!config_2.JWT_PASSWORD) {
             throw new Error("JWT_SECRET is not defined");
         }
-        console.log("in authcontro", config_2.JWT_PASSWORD);
         const token = jsonwebtoken_1.default.sign({ id: user.id, email: user.email }, config_2.JWT_PASSWORD);
         const { password: _ } = user, userData = __rest(user, ["password"]);
         res.status(200).json({

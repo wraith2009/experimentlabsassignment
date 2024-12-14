@@ -13,7 +13,7 @@ export const jwtAuth = (
 ) => {
   try {
     const token = req.header("Authorization")?.replace("Bearer ", "") ?? "";
-    console.log(token);
+
     if (!token) {
       res.status(403).json({ message: "No token provided." });
     }
@@ -21,7 +21,7 @@ export const jwtAuth = (
     if (!JWT_PASSWORD) {
       throw new Error("JWT_PASSWORD is not defined.");
     }
-    console.log("in middleware", JWT_PASSWORD);
+
     const decoded = jwt.verify(token, JWT_PASSWORD) as JwtPayload;
 
     if (!decoded || typeof decoded !== "object" || !decoded.id) {

@@ -16,7 +16,6 @@ exports.DeleteEvents = exports.GetEvents = exports.UpdateEvent = exports.CreateE
 const db_1 = __importDefault(require("../db"));
 const CreateEvent = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { userId, title, description, startDate, endDate } = req.body;
-    console.log(req.body);
     try {
         if (!userId || !title || !startDate || !endDate) {
             res.status(400).json({
@@ -24,7 +23,6 @@ const CreateEvent = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             });
             return;
         }
-        console.log(title);
         const parsedstartDate = new Date(startDate);
         const parsedendDate = new Date(endDate);
         if (isNaN(parsedstartDate.getTime())) {
@@ -58,7 +56,6 @@ const CreateEvent = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         });
     }
     catch (error) {
-        console.log(error);
         res.status(500).json({
             message: "Failed to create event",
         });

@@ -54,7 +54,6 @@ const EventManagementCalendar: React.FC = () => {
     fetchEvents();
   }, [userId, setGlobalEvents]);
 
-  console.log("events", globalEvents);
   const toggleModal = () => setIsModalOpen(!isModalOpen);
 
   const handleDateSelect = useCallback(
@@ -87,8 +86,8 @@ const EventManagementCalendar: React.FC = () => {
 
   const updateEvent = async (updatedEvent: CalendarEvent) => {
     try {
-      const response = await apiCall("/update-event", updatedEvent);
-      console.log(response);
+      await apiCall("/update-event", updatedEvent);
+
       setGlobalEvents((prevEvents) =>
         prevEvents.map((event) =>
           event.id === updatedEvent.id ? updatedEvent : event
@@ -109,7 +108,7 @@ const EventManagementCalendar: React.FC = () => {
   const addEvent = async (newEvent: CalendarEvent) => {
     try {
       const response = await apiCall("/create-event", newEvent);
-      console.log(response);
+
       const addedEvent = {
         ...newEvent,
         id: response.event.id,
@@ -122,8 +121,6 @@ const EventManagementCalendar: React.FC = () => {
       alert("Failed to add event. Please try again.");
     }
   };
-
-  console.log("selectedDateEvents", selectedDateEvents);
 
   if (!token) {
     return <Navigate to="/sign-in" />;
