@@ -5,6 +5,7 @@ import apiCall from "../../api/api";
 import { useSetRecoilState } from "recoil";
 import { UserIdState } from "../../recoil/atom/auth.atoms";
 import GoogleLoginComponent from "./googleLogin";
+import { AuthSchema } from "../../config/validators/auth.validator";
 
 const SignInPageComponent = () => {
   const [formData, setFormData] = useState({
@@ -34,6 +35,11 @@ const SignInPageComponent = () => {
       email: formData.email,
       password: formData.password,
     };
+
+    const isValidData = AuthSchema.safeParse(data);
+    if (!isValidData.success) {
+      setError("Validation failed");
+    }
 
     try {
       const response = await apiCall(url, data);

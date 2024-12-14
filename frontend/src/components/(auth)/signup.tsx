@@ -3,6 +3,7 @@ import { useState } from "react";
 import apiCall from "../../api/api";
 import { useNavigate, Link } from "react-router-dom";
 import GoogleLoginComponent from "./googleLogin";
+import { AuthSchema } from "../../config/validators/auth.validator";
 
 const SignUpPageComponent = () => {
   const [formData, setFormData] = useState({
@@ -32,6 +33,11 @@ const SignUpPageComponent = () => {
       setError("Please enter both email and password");
       setLoading(false);
       return;
+    }
+
+    const isValidData = AuthSchema.safeParse(formData);
+    if (!isValidData.success) {
+      setError("Validation failed");
     }
 
     try {

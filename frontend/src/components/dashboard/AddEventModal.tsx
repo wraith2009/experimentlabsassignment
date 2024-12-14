@@ -63,6 +63,12 @@ const EventModal: React.FC<EventModalProps> = ({
       return;
     }
 
+    const currentDate = new Date();
+    if (startDate < currentDate) {
+      alert("You cannot create an event in the past!");
+      return;
+    }
+
     const eventData: CalendarEvent = {
       id: existingEvent?.id || "",
       title,

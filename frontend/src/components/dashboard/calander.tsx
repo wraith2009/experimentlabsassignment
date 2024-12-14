@@ -171,7 +171,7 @@ const EventManagementCalendar: React.FC = () => {
                       "MMMM Do, YYYY"
                     )}
                   </h2>
-                  <div className="space-y-4 overflow-y-scroll scrollbar-hide">
+                  <div className="space-y-4 overflow-y-scroll overflow-hidden">
                     {selectedDateEvents.map((event) => (
                       <div
                         key={event.id}
