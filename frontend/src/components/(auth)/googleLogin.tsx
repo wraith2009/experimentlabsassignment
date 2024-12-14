@@ -2,18 +2,23 @@
 import { useGoogleLogin } from "@react-oauth/google";
 import apiCall from "../../api/api";
 import { useNavigate } from "react-router-dom";
+import { UserIdState } from "../../recoil/atom/auth.atoms";
+import { useSetRecoilState } from "recoil";
 import { FaGoogle } from "react-icons/fa";
 function GoogleLoginComponent() {
   const navigate = useNavigate();
+  const setUserId = useSetRecoilState(UserIdState);
   const googleResponse = async (authResult: any) => {
     try {
       if (authResult["code"]) {
         const url = `/auth/google?code=${authResult.code}`;
         const response = await apiCall(url, {}, "GET");
+        console.log("response", response);
         const token = response.token;
 
         if (token) {
           localStorage.setItem("token", token);
+          setUserId(response.user.id);
           navigate("/Home");
         }
       }
