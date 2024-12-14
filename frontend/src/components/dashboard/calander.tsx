@@ -185,8 +185,8 @@ const EventManagementCalendar: React.FC = () => {
                           {event.title}
                         </h3>
                         <p className="text-sm text-gray-600">
-                          {moment(event.start).format("h:mm A")} -{" "}
-                          {moment(event.end).format("h:mm A")}
+                          {moment(event.startDate).format("h:mm A")} -{" "}
+                          {moment(event.endDate).format("h:mm A")}
                         </p>
                         {event.description && (
                           <p className="text-sm text-gray-500 mt-2">
