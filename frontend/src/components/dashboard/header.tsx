@@ -1,6 +1,14 @@
 import { Container } from "./container";
+import { useNavigate } from "react-router-dom";
+
 export function Header() {
-  const handlegout = () => {};
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/sign-in");
+  };
+
   return (
     <header className="border-b">
       <Container className="max-md:px-4">
@@ -9,14 +17,12 @@ export function Header() {
             EventCalendar
           </div>
           <div>
-            <>
-              <button
-                onClick={handlegout}
-                className="bg-blue-400 px-6 py-3 text-white rounded-lg hover:bg-blue-700 transition"
-              >
-                Logout
-              </button>
-            </>
+            <button
+              onClick={handleLogout}
+              className="bg-blue-400 px-6 py-3 text-white rounded-lg hover:bg-blue-700 transition"
+            >
+              Logout
+            </button>
           </div>
         </nav>
       </Container>

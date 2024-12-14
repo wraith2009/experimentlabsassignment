@@ -10,6 +10,7 @@ import { useRecoilValue, useRecoilState } from "recoil";
 import { Container } from "./container";
 import { Header } from "./header";
 import { eventState } from "../../recoil/atom/event.atoms";
+import { Navigate } from "react-router-dom";
 
 interface CalendarEvent extends Event {
   id: string;
@@ -21,9 +22,10 @@ interface CalendarEvent extends Event {
 }
 
 const EventManagementCalendar: React.FC = () => {
+  const token = localStorage.getItem("token");
+
   const localizer = momentLocalizer(moment);
   const [globalEvents, setGlobalEvents] = useRecoilState(eventState);
-  const [global, setGlobal] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [eventToEdit, setEventToEdit] = useState<CalendarEvent | null>(null);
   const [selectedDateEvents, setSelectedDateEvents] = useState<CalendarEvent[]>(
@@ -52,11 +54,6 @@ const EventManagementCalendar: React.FC = () => {
     fetchEvents();
   }, [userId, setGlobalEvents]);
 
-  useEffect(() => {
-    setSelectedDateEvents(globalEvents);
-  }, [globalEvents, setGlobal]);
-
-  console.log("global", global);
   console.log("events", globalEvents);
   const toggleModal = () => setIsModalOpen(!isModalOpen);
 
@@ -128,6 +125,10 @@ const EventManagementCalendar: React.FC = () => {
 
   console.log("selectedDateEvents", selectedDateEvents);
 
+  if (!token) {
+    return <Navigate to="/sign-in" />;
+  }
+
   return (
     <>
       <Header />
@@ -137,22 +138,20 @@ const EventManagementCalendar: React.FC = () => {
           <div className="flex flex-col lg:flex-row mx-auto h-[calc(100dvh_-_80.8px)] p-4 md:p-8">
             <div className="w-full lg:w-9/12 lg:pr-4 mb-4 lg:mb-0">
               <div className="bg-white h-[400px] md:h-[600px] lg:h-[600px]">
-                {globalEvents.length > 0 && (
-                  <Calendar
-                    localizer={localizer}
-                    events={globalEvents}
-                    startAccessor="startDate"
-                    endAccessor="endDate"
-                    onSelectEvent={(event: CalendarEvent) =>
-                      handleDateSelect(event.startDate)
-                    }
-                    selectable
-                    className="h-full custom-calendar"
-                    views={["month", "week", "day"]}
-                    defaultView="month"
-                    style={{ height: "500" }}
-                  />
-                )}
+                <Calendar
+                  localizer={localizer}
+                  events={globalEvents}
+                  startAccessor="startDate"
+                  endAccessor="endDate"
+                  onSelectEvent={(event: CalendarEvent) =>
+                    handleDateSelect(event.startDate)
+                  }
+                  selectable
+                  className="h-full custom-calendar"
+                  views={["month", "week", "day"]}
+                  defaultView="month"
+                  style={{ height: "500" }}
+                />
               </div>
             </div>
 

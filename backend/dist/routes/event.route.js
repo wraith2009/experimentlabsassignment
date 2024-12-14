@@ -1,0 +1,11 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const auth_middleware_1 = require("./../middleware/auth.middleware");
+const express_1 = require("express");
+const event_controller_1 = require("../controller/event.controller");
+const EventRouter = (0, express_1.Router)();
+EventRouter.route("/create-event").post(auth_middleware_1.jwtAuth, event_controller_1.CreateEvent);
+EventRouter.route("/get-event").post(event_controller_1.GetEvents);
+EventRouter.route("/update-event").post(auth_middleware_1.jwtAuth, event_controller_1.UpdateEvent);
+EventRouter.route("/delete-event").post(auth_middleware_1.jwtAuth, event_controller_1.DeleteEvents);
+exports.default = EventRouter;

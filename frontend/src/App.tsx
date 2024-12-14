@@ -3,11 +3,12 @@ import SignInPageComponent from "./components/(auth)/signin";
 import SignUpPageComponent from "./components/(auth)/signup";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import EventManagementCalendar from "./components/dashboard/calander";
+import { GuestRoute } from "./config/GuestRoute";
 
 const appRouting = createBrowserRouter([
   {
     path: "/",
-    element: <SignInPageComponent />,
+    element: <GuestRoute />,
   },
   {
     path: "sign-in",
@@ -19,6 +20,7 @@ const appRouting = createBrowserRouter([
   },
   {
     path: "/home",
+
     children: [
       {
         index: true,
