@@ -19,6 +19,9 @@ model User {
   password          String?
   OauthId           String? 
   events            Events[] 
+  accessToken       String?
+  refreshToken      String?
+  tokenExpiry       DateTime?
 }
 
 model Events {
@@ -27,6 +30,7 @@ model Events {
   description       String
   startDate         DateTime
   endDate           DateTime
+  googleEventId     String?
   userId            String
   user              User     @relation(fields: [userId], references: [id])
 }

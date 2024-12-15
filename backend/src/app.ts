@@ -8,6 +8,7 @@ const app = express();
 const allowedOrigins = [
   "https://experimentlabsassignment-tak1.vercel.app",
   "http://localhost:5173",
+  "*",
 ];
 
 const corsOptions = {

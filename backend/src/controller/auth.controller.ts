@@ -2,20 +2,10 @@ import prisma from "../db";
 import { Request, Response } from "express";
 import { SALTROUNDS } from "../config";
 import jwt from "jsonwebtoken";
-import { JWT_SECRET } from "../config";
 import bcryptjs from "bcryptjs";
-import { google } from "googleapis";
 import axios from "axios";
 import { JWT_PASSWORD } from "../config";
-
-const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
-const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
-
-const oauth2Client = new google.auth.OAuth2(
-  GOOGLE_CLIENT_ID,
-  GOOGLE_CLIENT_SECRET,
-  "postmessage"
-);
+import { oauth2Client } from "../googleauth";
 
 export const googleLogin = async (
   req: Request,
@@ -24,9 +14,7 @@ export const googleLogin = async (
   const code = req.query.code as string | undefined;
 
   if (!code) {
-    res.status(400).json({
-      message: "Authorization code is required",
-    });
+    res.status(400).json({ message: "Authorization code is required" });
     return;
   }
 
@@ -34,54 +22,49 @@ export const googleLogin = async (
     const { tokens } = await oauth2Client.getToken(code);
     oauth2Client.setCredentials(tokens);
 
-    const userRes = await axios.get(
-      `https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${tokens.access_token}`
+    const { data: userInfo } = await axios.get(
+      `https://www.googleapis.com/oauth2/v3/userinfo?access_token=${tokens.access_token}`
     );
 
-    const { email, id: OauthId } = userRes.data;
+    const { email, sub: googleId, name, picture } = userInfo;
 
-    if (!email || !OauthId) {
-      res.status(400).json({
-        message: "Failed to fetch user email or OauthId from Google",
-      });
-      return;
-    }
-
-    let existingUser = await prisma.user.findFirst({
-      where: {
-        email,
-      },
+    let user = await prisma.user.findUnique({
+      where: { email },
     });
 
-    if (!existingUser) {
-      existingUser = await prisma.user.create({
+    if (!user) {
+      user = await prisma.user.create({
         data: {
           email,
-          OauthId,
+          OauthId: googleId,
+          accessToken: tokens.access_token,
+          refreshToken: tokens.refresh_token,
         },
       });
-    } else if (!existingUser.OauthId) {
-      // Update the user to include OauthId if it's missing
-      existingUser = await prisma.user.update({
-        where: { id: existingUser.id },
-        data: { OauthId },
+    } else {
+      user = await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          accessToken: tokens.access_token,
+          refreshToken: tokens.refresh_token,
+        },
       });
     }
 
-    const { id } = existingUser;
-
-    if (!JWT_PASSWORD) {
-      throw new Error("JWT_PASSWORD is not defined");
-    }
-    const token = jwt.sign({ id }, JWT_PASSWORD);
+    const jwtToken = jwt.sign(
+      { id: user.id },
+      process.env.JWT_PASSWORD || "your_secret_key",
+      { expiresIn: "1h" }
+    );
 
     res.status(200).json({
-      token,
+      jwtToken,
       message: "User Logged In Successfully",
       user: {
-        id: existingUser.id,
-        email: existingUser.email,
-        OauthId: existingUser.OauthId,
+        id: user.id,
+        email: user.email,
+        OauthId: user.OauthId,
+        accessToken: tokens.access_token,
       },
     });
   } catch (error) {
