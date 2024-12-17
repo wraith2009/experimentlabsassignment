@@ -216,14 +216,14 @@ export const GetEvents = async (req: Request, res: Response): Promise<void> => {
     googleEvents.data.items?.forEach((event) => {
       if (!uniqueEvents.has(event.id)) {
         uniqueEvents.set(event.id, {
-          id: event.id, // Google event ID
+          id: event.id, 
           title: event.summary,
           description: event.description,
           startDate: event.start
             ? event.start.dateTime || event.start.date
             : undefined,
           endDate: event.end ? event.end.dateTime || event.end.date : undefined,
-          source: "google", // Source can be used to differentiate
+          source: "google", 
         });
       }
     });
@@ -231,12 +231,12 @@ export const GetEvents = async (req: Request, res: Response): Promise<void> => {
     dbEvents.forEach((event) => {
       if (!uniqueEvents.has(event.id)) {
         uniqueEvents.set(event.id, {
-          id: event.id, // Your DB event ID
+          id: event.id, 
           title: event.title,
           description: event.description,
           startDate: event.startDate,
           endDate: event.endDate,
-          source: "db", // Source can be used to differentiate
+          source: "db",
         });
       }
     });
